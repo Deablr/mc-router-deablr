@@ -1,0 +1,31 @@
+# mc-router-deablr
+# SNI-based Minecraft router for the Deablr family servers.
+# Listens on the standard Minecraft port (25565) and routes players to the
+# correct backend based on the hostname they use to connect.
+#
+# Backends:
+#   - richard.deablr.com -> Richard's creative flat Paper 26.1.2 server
+#   - nijika.deablr.com  -> Nijika's Paper 26.1.2 server
+#
+# Both backend containers must be attached to dokploy-network and must NOT bind
+# host port 25565 themselves (only mc-router binds it).
+
+services:
+  mc-router:
+    image: itzg/mc-router:latest
+    container_name: mc-router-deablr
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+    ports:
+      - "25565:25565"
+    environment:
+      MAPPING: |
+        richard.deablr.com=richard-deablr-mc:25565
+        nijika.deablr.com=nijika-deablr-mc:25565
+    networks:
+      - dokploy-network
+
+networks:
+  dokploy-network:
+    external: true
