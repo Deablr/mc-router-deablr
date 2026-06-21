@@ -7,7 +7,7 @@
 #   - richard.deablr.com -> Richard's creative flat Paper 26.1.2 server
 #   - nijika.deablr.com  -> Nijika's Paper 26.1.2 server
 #
-# Both backend containers must be attached to dokploy-network and must NOT bind
+# Both backend containers must be attached to deabcraft and must NOT bind
 # host port 25565 themselves (only mc-router binds it).
 
 services:
@@ -24,8 +24,8 @@ services:
         richard.deablr.com=richard-deablr-mc:25565
         nijika.deablr.com=nijika-deablr-mc:25565
     networks:
-      - dokploy-network
+      - deabcraft
 
 networks:
-  dokploy-network:
+  deabcraft:
     external: true

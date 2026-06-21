@@ -16,7 +16,7 @@ Players connect to the router using a domain name, and `itzg/mc-router` forwards
 1. `mc-router` listens on host port `25565`.
 2. A Minecraft client connects to `richard.deablr.com:25565` or `nijika.deablr.com:25565`.
 3. `mc-router` reads the Server Name Indication (SNI) hostname and proxies the connection to the matching backend container.
-4. The backend containers are reached over the shared `dokploy-network` Docker network.
+4. The backend containers are reached over the shared `deabcraft` Docker network.
 
 ## Requirements
 
@@ -29,17 +29,17 @@ Players connect to the router using a domain name, and `itzg/mc-router` forwards
 
 For the router to reach the backend servers, each server Compose project **must**:
 
-1. Be attached to the `dokploy-network` network:
+1. Be attached to the `deabcraft` network:
 
    ```yaml
    services:
      mc:
        # ...
        networks:
-         - dokploy-network
+         - deabcraft
 
    networks:
-     dokploy-network:
+     deabcraft:
        external: true
    ```
 
@@ -58,7 +58,7 @@ The backend containers will still listen on container port `25565`; only the hos
 1. In Dokploy, create a new **Compose** project.
 2. Connect this Git repository (`Deablr/mc-router-deablr`).
 3. Dokploy will run `docker compose up -d` and start `mc-router`.
-4. Ensure both backend servers are also running in Dokploy on the same `dokploy-network`.
+4. Ensure both backend servers are also running in Dokploy on the same `deabcraft`.
 
 ## DNS Setup
 
@@ -105,7 +105,7 @@ Another container or backend server is already bound to host port `25565`. Stop 
 ### Connection times out
 
 - Verify DNS `A` records point to the VPS IP.
-- Confirm both backend containers are running and attached to `dokploy-network`.
+- Confirm both backend containers are running and attached to `deabcraft`.
 - Check that the backend container names in `MAPPING` match the actual `container_name` values.
 
 ### Wrong server loads
