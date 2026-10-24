@@ -1,13 +1,16 @@
 # mc-router-deablr
-# SNI-based Minecraft router for the Deablr family servers.
-# Listens on the standard Minecraft port (25565) and routes players to the
-# correct backend based on the hostname they use to connect.
+# Routes Minecraft players to the Deablr family servers based on the hostname
+# they use to connect, so every server can share one public IP and port.
+#
+# Java flow:     client ──TCP 25565──▶ mc-router ──▶ backend by hostname
+# Bedrock flow:  client ──UDP 19132──▶ geyser (joins mc-router as a Java client,
+#                forwarding the hostname the player typed) ──▶ backend by hostname
 #
 # Backends:
 #   - richard.deablr.com -> Richard's creative flat Paper 26.1.2 server
-#   - nijika.deablr.com  -> Nijika's Paper 26.1.2 server
+#   - nijika.deablr.com  -> Nijika's Paper 26.3 server
 #
-# Both backend containers must be attached to dokploy-network and must NOT bind
+# All backend containers must be attached to dokploy-network and must NOT bind
 # host port 25565 themselves (only mc-router binds it).
 
 services:
@@ -26,6 +29,26 @@ services:
     networks:
       - dokploy-network
 
+  geyser:
+    build: ./geyser
+    container_name: geyser-deablr
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+    depends_on:
+      - mc-router
+    # Bedrock is UDP; neither mc-router nor Traefik can carry it, so Geyser binds it directly
+    ports:
+      - "19132:19132/udp"
+    volumes:
+      - geyser-data:/geyser
+      - /opt/deablr/floodgate/key.pem:/geyser/key.pem:ro
+    networks:
+      - dokploy-network
+
 networks:
   dokploy-network:
     external: true
+
+volumes:
+  geyser-data:
